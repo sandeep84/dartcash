@@ -7,8 +7,30 @@ import 'dart:collection';
 // but it's needed for moor to know about the generated code
 part 'gnc_database.g.dart';
 
-// this will generate a table called "todos" for us. The rows of that table will
-// be represented by a class called "Todo".
+@DataClassName("Commodity")
+class Commodities extends Table {
+  TextColumn get guid => text().withLength(max:32)();
+  TextColumn get namespace => text().withLength(max:2048)();
+  TextColumn get mnemonic => text().withLength(max:2048)();
+  TextColumn get fullname => text().withLength(max:2048)();
+  IntColumn get fraction => integer()();
+
+  @override 
+  Set<Column> get primaryKey => {guid}; 
+}
+
+class Prices extends Table {
+  TextColumn get guid => text().withLength(max:32)();
+  TextColumn get commodity_guid => text().withLength(max:32)();
+  TextColumn get currency_guid => text().withLength(max:32)();
+  TextColumn get date => text().withLength(max:19)();
+  IntColumn get value_num => integer()();
+  IntColumn get value_denom => integer()();
+
+  @override 
+  Set<Column> get primaryKey => {guid}; 
+}
+
 class Accounts extends Table {
   TextColumn get guid => text().withLength(max:32)();
   TextColumn get parent_guid => text().withLength(max:32)();
@@ -17,6 +39,24 @@ class Accounts extends Table {
   TextColumn get commodity_guid => text().withLength(max:32)();
   IntColumn get commodity_scu => integer()();
   IntColumn get non_std_scu => integer()();
+
+  @override 
+  Set<Column> get primaryKey => {guid}; 
+}
+
+class Splits extends Table {
+  TextColumn get guid => text().withLength(max:32)();
+  TextColumn get tx_guid => text().withLength(max:32)();
+  TextColumn get account_guid => text().withLength(max:32)();
+  TextColumn get memo => text().withLength(max:2048)();
+  TextColumn get action => text().withLength(max:2048)();
+  IntColumn get value_num => integer()();
+  IntColumn get value_denom => integer()();
+  IntColumn get quantity_num => integer()();
+  IntColumn get quantity_denom => integer()();
+
+  @override 
+  Set<Column> get primaryKey => {guid}; 
 }
 
 LazyDatabase _openConnection(String dbPath) {
@@ -26,7 +66,7 @@ LazyDatabase _openConnection(String dbPath) {
   });
 }
 
-@UseMoor(tables: [Accounts])
+@UseMoor(tables: [Commodities, Prices, Accounts, Splits])
 class GncDatabase extends _$GncDatabase {
   // we tell the database where to store the data with this constructor
   GncDatabase(String dbPath) : super(_openConnection(dbPath));
@@ -37,5 +77,6 @@ class GncDatabase extends _$GncDatabase {
   int get schemaVersion => 1;
 
   Future<List<Account>> get_accounts() => select(accounts).get();
+  Future<List<Split>> get_splits() => select(splits).get();
 }
 

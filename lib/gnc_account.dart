@@ -1,13 +1,17 @@
 import 'gnc_database.dart';
+import 'gnc_book.dart';
+import 'gnc_split.dart';
 import 'dart:collection'; 
 
 class GncAccount 
 {
-  GncAccount(this._database, this._account);
-
-  final GncDatabase _database;
+  final GncBook _book;
   final Account _account;
+  GncAccount _parent;
   SplayTreeSet<GncAccount> children = SplayTreeSet((GncAccount a, GncAccount b) => a.name.compareTo(b.name));
+  List<GncSplit> splits = [];
+
+  GncAccount(this._book, this._account);
 
   String get guid => _account.guid;
   String get parent_guid => _account.parent_guid;
@@ -17,32 +21,25 @@ class GncAccount
 
   void addChild(GncAccount child) 
   {
+    child._parent = this;
     this.children.add(child);
   }
 
-  double get_balance([bool recursive=true])
+  void addSplit(GncSplit split)
   {
+    splits.add(split);
+  }
+
+  double get_balance([recursive=true]) {
     double balance = 0.0;
+    splits.forEach( (split) => balance += split.quantity );
 
-    //final accountSplitListStmt = _database.prepare('''
-    //        Select
-    //          Sum(splits.value_num) / 100.0 as balance
-    //        From
-    //          accounts Left Outer Join
-    //          splits On accounts.guid = splits.account_guid
-    //        Where
-    //          accounts.guid = "${guid}"
-    //        ''');
-
-    //for (final GncAccount in accountSplitListStmt.select()) {
-    //   if (GncAccount["balance"] != null) balance = GncAccount["balance"];
-    //}
-
-    //if (recursive) {
-    //  this.children.forEach((c) => balance += c.get_balance(recursive));
-    //}
+    if (recursive) {
+      children.forEach( (child) => balance += child.get_balance(recursive) );
+    }
 
     return balance;
   }
+
 }
 

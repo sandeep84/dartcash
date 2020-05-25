@@ -2,8 +2,6 @@
 .dart_tool/
 .packages
 
-*.g.dart
-
 # Conventional directory for build outputs
 build/
 
@@ -12,6 +10,7 @@ doc/api/
 
 # Temporary files
 *.swp
+*.log
 
 # Data files
 *.gnucash
