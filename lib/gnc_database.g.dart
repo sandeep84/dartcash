@@ -1672,6 +1672,376 @@ class $SplitsTable extends Splits with TableInfo<$SplitsTable, Split> {
   }
 }
 
+class Transaction extends DataClass implements Insertable<Transaction> {
+  final String guid;
+  final String currency_guid;
+  final String num;
+  final String post_date;
+  final String enter_date;
+  final String description;
+  Transaction(
+      {@required this.guid,
+      @required this.currency_guid,
+      @required this.num,
+      @required this.post_date,
+      @required this.enter_date,
+      @required this.description});
+  factory Transaction.fromData(Map<String, dynamic> data, GeneratedDatabase db,
+      {String prefix}) {
+    final effectivePrefix = prefix ?? '';
+    final stringType = db.typeSystem.forDartType<String>();
+    return Transaction(
+      guid: stringType.mapFromDatabaseResponse(data['${effectivePrefix}guid']),
+      currency_guid: stringType
+          .mapFromDatabaseResponse(data['${effectivePrefix}currency_guid']),
+      num: stringType.mapFromDatabaseResponse(data['${effectivePrefix}num']),
+      post_date: stringType
+          .mapFromDatabaseResponse(data['${effectivePrefix}post_date']),
+      enter_date: stringType
+          .mapFromDatabaseResponse(data['${effectivePrefix}enter_date']),
+      description: stringType
+          .mapFromDatabaseResponse(data['${effectivePrefix}description']),
+    );
+  }
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (!nullToAbsent || guid != null) {
+      map['guid'] = Variable<String>(guid);
+    }
+    if (!nullToAbsent || currency_guid != null) {
+      map['currency_guid'] = Variable<String>(currency_guid);
+    }
+    if (!nullToAbsent || num != null) {
+      map['num'] = Variable<String>(num);
+    }
+    if (!nullToAbsent || post_date != null) {
+      map['post_date'] = Variable<String>(post_date);
+    }
+    if (!nullToAbsent || enter_date != null) {
+      map['enter_date'] = Variable<String>(enter_date);
+    }
+    if (!nullToAbsent || description != null) {
+      map['description'] = Variable<String>(description);
+    }
+    return map;
+  }
+
+  TransactionsCompanion toCompanion(bool nullToAbsent) {
+    return TransactionsCompanion(
+      guid: guid == null && nullToAbsent ? const Value.absent() : Value(guid),
+      currency_guid: currency_guid == null && nullToAbsent
+          ? const Value.absent()
+          : Value(currency_guid),
+      num: num == null && nullToAbsent ? const Value.absent() : Value(num),
+      post_date: post_date == null && nullToAbsent
+          ? const Value.absent()
+          : Value(post_date),
+      enter_date: enter_date == null && nullToAbsent
+          ? const Value.absent()
+          : Value(enter_date),
+      description: description == null && nullToAbsent
+          ? const Value.absent()
+          : Value(description),
+    );
+  }
+
+  factory Transaction.fromJson(Map<String, dynamic> json,
+      {ValueSerializer serializer}) {
+    serializer ??= moorRuntimeOptions.defaultSerializer;
+    return Transaction(
+      guid: serializer.fromJson<String>(json['guid']),
+      currency_guid: serializer.fromJson<String>(json['currency_guid']),
+      num: serializer.fromJson<String>(json['num']),
+      post_date: serializer.fromJson<String>(json['post_date']),
+      enter_date: serializer.fromJson<String>(json['enter_date']),
+      description: serializer.fromJson<String>(json['description']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer serializer}) {
+    serializer ??= moorRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'guid': serializer.toJson<String>(guid),
+      'currency_guid': serializer.toJson<String>(currency_guid),
+      'num': serializer.toJson<String>(num),
+      'post_date': serializer.toJson<String>(post_date),
+      'enter_date': serializer.toJson<String>(enter_date),
+      'description': serializer.toJson<String>(description),
+    };
+  }
+
+  Transaction copyWith(
+          {String guid,
+          String currency_guid,
+          String num,
+          String post_date,
+          String enter_date,
+          String description}) =>
+      Transaction(
+        guid: guid ?? this.guid,
+        currency_guid: currency_guid ?? this.currency_guid,
+        num: num ?? this.num,
+        post_date: post_date ?? this.post_date,
+        enter_date: enter_date ?? this.enter_date,
+        description: description ?? this.description,
+      );
+  @override
+  String toString() {
+    return (StringBuffer('Transaction(')
+          ..write('guid: $guid, ')
+          ..write('currency_guid: $currency_guid, ')
+          ..write('num: $num, ')
+          ..write('post_date: $post_date, ')
+          ..write('enter_date: $enter_date, ')
+          ..write('description: $description')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => $mrjf($mrjc(
+      guid.hashCode,
+      $mrjc(
+          currency_guid.hashCode,
+          $mrjc(
+              num.hashCode,
+              $mrjc(post_date.hashCode,
+                  $mrjc(enter_date.hashCode, description.hashCode))))));
+  @override
+  bool operator ==(dynamic other) =>
+      identical(this, other) ||
+      (other is Transaction &&
+          other.guid == this.guid &&
+          other.currency_guid == this.currency_guid &&
+          other.num == this.num &&
+          other.post_date == this.post_date &&
+          other.enter_date == this.enter_date &&
+          other.description == this.description);
+}
+
+class TransactionsCompanion extends UpdateCompanion<Transaction> {
+  final Value<String> guid;
+  final Value<String> currency_guid;
+  final Value<String> num;
+  final Value<String> post_date;
+  final Value<String> enter_date;
+  final Value<String> description;
+  const TransactionsCompanion({
+    this.guid = const Value.absent(),
+    this.currency_guid = const Value.absent(),
+    this.num = const Value.absent(),
+    this.post_date = const Value.absent(),
+    this.enter_date = const Value.absent(),
+    this.description = const Value.absent(),
+  });
+  TransactionsCompanion.insert({
+    @required String guid,
+    @required String currency_guid,
+    @required String num,
+    @required String post_date,
+    @required String enter_date,
+    @required String description,
+  })  : guid = Value(guid),
+        currency_guid = Value(currency_guid),
+        num = Value(num),
+        post_date = Value(post_date),
+        enter_date = Value(enter_date),
+        description = Value(description);
+  static Insertable<Transaction> custom({
+    Expression<String> guid,
+    Expression<String> currency_guid,
+    Expression<String> num,
+    Expression<String> post_date,
+    Expression<String> enter_date,
+    Expression<String> description,
+  }) {
+    return RawValuesInsertable({
+      if (guid != null) 'guid': guid,
+      if (currency_guid != null) 'currency_guid': currency_guid,
+      if (num != null) 'num': num,
+      if (post_date != null) 'post_date': post_date,
+      if (enter_date != null) 'enter_date': enter_date,
+      if (description != null) 'description': description,
+    });
+  }
+
+  TransactionsCompanion copyWith(
+      {Value<String> guid,
+      Value<String> currency_guid,
+      Value<String> num,
+      Value<String> post_date,
+      Value<String> enter_date,
+      Value<String> description}) {
+    return TransactionsCompanion(
+      guid: guid ?? this.guid,
+      currency_guid: currency_guid ?? this.currency_guid,
+      num: num ?? this.num,
+      post_date: post_date ?? this.post_date,
+      enter_date: enter_date ?? this.enter_date,
+      description: description ?? this.description,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (guid.present) {
+      map['guid'] = Variable<String>(guid.value);
+    }
+    if (currency_guid.present) {
+      map['currency_guid'] = Variable<String>(currency_guid.value);
+    }
+    if (num.present) {
+      map['num'] = Variable<String>(num.value);
+    }
+    if (post_date.present) {
+      map['post_date'] = Variable<String>(post_date.value);
+    }
+    if (enter_date.present) {
+      map['enter_date'] = Variable<String>(enter_date.value);
+    }
+    if (description.present) {
+      map['description'] = Variable<String>(description.value);
+    }
+    return map;
+  }
+}
+
+class $TransactionsTable extends Transactions
+    with TableInfo<$TransactionsTable, Transaction> {
+  final GeneratedDatabase _db;
+  final String _alias;
+  $TransactionsTable(this._db, [this._alias]);
+  final VerificationMeta _guidMeta = const VerificationMeta('guid');
+  GeneratedTextColumn _guid;
+  @override
+  GeneratedTextColumn get guid => _guid ??= _constructGuid();
+  GeneratedTextColumn _constructGuid() {
+    return GeneratedTextColumn('guid', $tableName, false, maxTextLength: 32);
+  }
+
+  final VerificationMeta _currency_guidMeta =
+      const VerificationMeta('currency_guid');
+  GeneratedTextColumn _currency_guid;
+  @override
+  GeneratedTextColumn get currency_guid =>
+      _currency_guid ??= _constructCurrencyGuid();
+  GeneratedTextColumn _constructCurrencyGuid() {
+    return GeneratedTextColumn('currency_guid', $tableName, false,
+        maxTextLength: 32);
+  }
+
+  final VerificationMeta _numMeta = const VerificationMeta('num');
+  GeneratedTextColumn _num;
+  @override
+  GeneratedTextColumn get num => _num ??= _constructNum();
+  GeneratedTextColumn _constructNum() {
+    return GeneratedTextColumn('num', $tableName, false, maxTextLength: 2048);
+  }
+
+  final VerificationMeta _post_dateMeta = const VerificationMeta('post_date');
+  GeneratedTextColumn _post_date;
+  @override
+  GeneratedTextColumn get post_date => _post_date ??= _constructPostDate();
+  GeneratedTextColumn _constructPostDate() {
+    return GeneratedTextColumn('post_date', $tableName, false,
+        maxTextLength: 19);
+  }
+
+  final VerificationMeta _enter_dateMeta = const VerificationMeta('enter_date');
+  GeneratedTextColumn _enter_date;
+  @override
+  GeneratedTextColumn get enter_date => _enter_date ??= _constructEnterDate();
+  GeneratedTextColumn _constructEnterDate() {
+    return GeneratedTextColumn('enter_date', $tableName, false,
+        maxTextLength: 19);
+  }
+
+  final VerificationMeta _descriptionMeta =
+      const VerificationMeta('description');
+  GeneratedTextColumn _description;
+  @override
+  GeneratedTextColumn get description =>
+      _description ??= _constructDescription();
+  GeneratedTextColumn _constructDescription() {
+    return GeneratedTextColumn('description', $tableName, false,
+        maxTextLength: 2048);
+  }
+
+  @override
+  List<GeneratedColumn> get $columns =>
+      [guid, currency_guid, num, post_date, enter_date, description];
+  @override
+  $TransactionsTable get asDslTable => this;
+  @override
+  String get $tableName => _alias ?? 'transactions';
+  @override
+  final String actualTableName = 'transactions';
+  @override
+  VerificationContext validateIntegrity(Insertable<Transaction> instance,
+      {bool isInserting = false}) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('guid')) {
+      context.handle(
+          _guidMeta, guid.isAcceptableOrUnknown(data['guid'], _guidMeta));
+    } else if (isInserting) {
+      context.missing(_guidMeta);
+    }
+    if (data.containsKey('currency_guid')) {
+      context.handle(
+          _currency_guidMeta,
+          currency_guid.isAcceptableOrUnknown(
+              data['currency_guid'], _currency_guidMeta));
+    } else if (isInserting) {
+      context.missing(_currency_guidMeta);
+    }
+    if (data.containsKey('num')) {
+      context.handle(
+          _numMeta, num.isAcceptableOrUnknown(data['num'], _numMeta));
+    } else if (isInserting) {
+      context.missing(_numMeta);
+    }
+    if (data.containsKey('post_date')) {
+      context.handle(_post_dateMeta,
+          post_date.isAcceptableOrUnknown(data['post_date'], _post_dateMeta));
+    } else if (isInserting) {
+      context.missing(_post_dateMeta);
+    }
+    if (data.containsKey('enter_date')) {
+      context.handle(
+          _enter_dateMeta,
+          enter_date.isAcceptableOrUnknown(
+              data['enter_date'], _enter_dateMeta));
+    } else if (isInserting) {
+      context.missing(_enter_dateMeta);
+    }
+    if (data.containsKey('description')) {
+      context.handle(
+          _descriptionMeta,
+          description.isAcceptableOrUnknown(
+              data['description'], _descriptionMeta));
+    } else if (isInserting) {
+      context.missing(_descriptionMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => <GeneratedColumn>{};
+  @override
+  Transaction map(Map<String, dynamic> data, {String tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : null;
+    return Transaction.fromData(data, _db, prefix: effectivePrefix);
+  }
+
+  @override
+  $TransactionsTable createAlias(String alias) {
+    return $TransactionsTable(_db, alias);
+  }
+}
+
 abstract class _$GncDatabase extends GeneratedDatabase {
   _$GncDatabase(QueryExecutor e) : super(SqlTypeSystem.defaultInstance, e);
   $CommoditiesTable _commodities;
@@ -1682,9 +2052,12 @@ abstract class _$GncDatabase extends GeneratedDatabase {
   $AccountsTable get accounts => _accounts ??= $AccountsTable(this);
   $SplitsTable _splits;
   $SplitsTable get splits => _splits ??= $SplitsTable(this);
+  $TransactionsTable _transactions;
+  $TransactionsTable get transactions =>
+      _transactions ??= $TransactionsTable(this);
   @override
   Iterable<TableInfo> get allTables => allSchemaEntities.whereType<TableInfo>();
   @override
   List<DatabaseSchemaEntity> get allSchemaEntities =>
-      [commodities, prices, accounts, splits];
+      [commodities, prices, accounts, splits, transactions];
 }

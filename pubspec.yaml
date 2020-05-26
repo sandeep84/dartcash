@@ -9,7 +9,7 @@ environment:
 dependencies:
   moor: # use the latest version
   moor_ffi: # use the latest version
-  path:
+  intl:
 
 dev_dependencies:
   pedantic: ^1.9.0

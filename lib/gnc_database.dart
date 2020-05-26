@@ -44,6 +44,15 @@ class Accounts extends Table {
   Set<Column> get primaryKey => {guid}; 
 }
 
+class Transactions extends Table {
+  TextColumn get guid => text().withLength(max:32)();
+  TextColumn get currency_guid => text().withLength(max:32)();
+  TextColumn get num => text().withLength(max:2048)();
+  TextColumn get post_date => text().withLength(max:19)();
+  TextColumn get enter_date => text().withLength(max:19)();
+  TextColumn get description => text().withLength(max:2048)();
+}
+
 class Splits extends Table {
   TextColumn get guid => text().withLength(max:32)();
   TextColumn get tx_guid => text().withLength(max:32)();
@@ -66,7 +75,7 @@ LazyDatabase _openConnection(String dbPath) {
   });
 }
 
-@UseMoor(tables: [Commodities, Prices, Accounts, Splits])
+@UseMoor(tables: [Commodities, Prices, Accounts, Splits, Transactions])
 class GncDatabase extends _$GncDatabase {
   // we tell the database where to store the data with this constructor
   GncDatabase(String dbPath) : super(_openConnection(dbPath));
@@ -77,6 +86,12 @@ class GncDatabase extends _$GncDatabase {
   int get schemaVersion => 1;
 
   Future<List<Account>> get_accounts() => select(accounts).get();
-  Future<List<Split>> get_splits() => select(splits).get();
+  Future<List<TypedResult>> get_splits() => (select(transactions)
+      ..orderBy([(t) => OrderingTerm(expression: t.post_date, mode: OrderingMode.desc)])
+      )
+      .join([ leftOuterJoin(splits, splits.tx_guid.equalsExp(transactions.guid)), ])
+      .get();
+  Future<List<Commodity>> get_commodities() => select(commodities).get();
+  Future<List<Price>> get_prices() => (select(prices)..orderBy([(t) => OrderingTerm(expression: t.date, mode: OrderingMode.desc)])).get();
 }
 

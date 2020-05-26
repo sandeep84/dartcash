@@ -1,18 +1,32 @@
 import 'gnc_database.dart';
 import 'gnc_account.dart';
 import 'gnc_split.dart';
+import 'gnc_commodity.dart';
 
 class GncBook {
-    GncDatabase _database;
+    GncDatabase session;
     final Map<String, GncAccount> accountMap = {}; // map with key=guid
+    final Map<String, GncCommodity> commodityMap = {}; // map with key=guid
     GncAccount rootAccount;
 
+    GncCommodity get baseCurrency {
+      return rootAccount.commodity;
+    }
+
     void open(String dbPath) async {
-        _database = new GncDatabase(dbPath);
+        session = new GncDatabase(dbPath);
+
+        for (final commodity in await session.get_commodities()) {
+          commodityMap[commodity.guid] = GncCommodity(this, commodity);
+        }
+
+        for (final price in await session.get_prices()) {
+          commodityMap[price.commodity_guid].addPrice(GncPrice(price));
+        }
 
         // Create the tree of accounts and identify the root account
-        for (final account in await _database.get_accounts()) {
-          GncAccount newAcc = GncAccount(this, account);
+        for (final account in await session.get_accounts()) {
+          GncAccount newAcc = GncAccount(this, account, commodityMap[account.commodity_guid]);
           accountMap[newAcc.guid] = newAcc;
 
           if ((newAcc.account_type == "ROOT") && (newAcc.name == "Root Account")) {
@@ -26,13 +40,22 @@ class GncBook {
           }
         });
 
-        for (final split in await _database.get_splits()) {
-          accountMap[split.account_guid].addSplit(GncSplit(this, split));
-        }
-
+        final splitList = await session.get_splits();
+        splitList.forEach((row) {
+          final split = row.readTable(session.splits);
+          final transaction = row.readTable(session.transactions);
+          accountMap[split.account_guid].addSplit(GncSplit(this, split, transaction));
+        });
     }
 
-    Future<List<GncAccount>> accounts() async {
+    void close() {
+      session = null;
+      rootAccount = null;
+      accountMap.clear();
+      commodityMap.clear();
+    }
+
+    List<GncAccount> accounts() {
         return rootAccount.children.toList();
     }
 
