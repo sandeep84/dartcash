@@ -1,5 +1,15 @@
-A sample command-line application with an entrypoint in `bin/`, library code
-in `lib/`, and example unit test in `test/`.
+Pure dart implementation of GNUCash sqlite format file support.
 
-Created from templates made available by Stagehand under a BSD-style
-[license](https://github.com/dart-lang/stagehand/blob/master/LICENSE).
+Offers read-only access to the contents of a file in the GNUCash sqlite format. The following operations are supported:
+* List of accounts including current balances in both the account commodity and base currency.
+* List details of splits and transactions belonging to an account
+
+API example:
+```
+    GncBook gncBook = new GncBook();
+    await gncBook.open("Accounts.gnucash");
+
+    for (final account in gncBook.accounts()) {
+      print("${account.name}: ${account.quantity} -> ${account.get_balance()}");
+    }
+```
