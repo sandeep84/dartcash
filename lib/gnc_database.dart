@@ -1,13 +1,12 @@
 import 'package:moor_ffi/moor_ffi.dart';
 import 'package:moor/moor.dart';
 import 'dart:io';
-import 'dart:collection'; 
 
 // assuming that your file is called account.dart. This will give an error at first,
 // but it's needed for moor to know about the generated code
 part 'gnc_database.g.dart';
 
-@DataClassName("Commodity")
+@DataClassName('Commodity')
 class Commodities extends Table {
   TextColumn get guid => text().withLength(max:32)();
   TextColumn get namespace => text().withLength(max:2048)();

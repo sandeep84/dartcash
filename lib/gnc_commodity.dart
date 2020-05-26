@@ -1,6 +1,6 @@
+import 'package:intl/intl.dart';
+
 import 'gnc_database.dart';
-import 'gnc_book.dart';
-import 'gnc_account.dart';
 
 class GncPrice
 {
@@ -16,15 +16,22 @@ class GncPrice
 
 class GncCommodity 
 {
-  final GncBook _book;
   final Commodity _commodity;
+  NumberFormat currencyFormat;
   List<GncPrice> priceList = [];
 
-  GncCommodity(this._book, this._commodity);
+  GncCommodity(this._commodity) {
+    final symbol = NumberFormat.currency().simpleCurrencySymbol(_commodity.mnemonic);
+    currencyFormat = NumberFormat.currency(symbol:symbol);
+  }
 
   String get guid => _commodity.guid;
   String get namespace => _commodity.namespace;
   String get mnemonic => _commodity.mnemonic;
+
+  String format(double value) {
+    return currencyFormat.format(value);
+  }
 
   void addPrice(GncPrice p) {
     priceList.add(p);

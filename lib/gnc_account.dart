@@ -1,5 +1,3 @@
-import 'package:intl/intl.dart';
-
 import 'gnc_database.dart';
 import 'gnc_book.dart';
 import 'gnc_split.dart';
@@ -29,7 +27,7 @@ class GncAccount
   void addChild(GncAccount child) 
   {
     child._parent = this;
-    this.children.add(child);
+    children.add(child);
   }
 
   void addSplit(GncSplit split)
@@ -42,43 +40,28 @@ class GncAccount
     return quantity;
   }
 
-  String getQuantityAsString() {
-    String symbol = NumberFormat.currency().simpleCurrencySymbol(this.commodity.mnemonic);
-    final currencyFormat = new NumberFormat.currency(symbol:symbol);
-    return currencyFormat.format(quantity);
-  }
+  double get_balance([recurse=true, other_commodity, natural_sign=true]) {
+    other_commodity ??= _book.baseCurrency;
 
-  String getBalanceAsString([recurse=true, other_commodity=null, natural_sign=true]) {
-    if (other_commodity == null) other_commodity = _book.baseCurrency;
-    String symbol = NumberFormat.currency().simpleCurrencySymbol(other_commodity.mnemonic);
-    final currencyFormat = new NumberFormat.currency(symbol:symbol);
-    return currencyFormat.format(get_balance(recurse, other_commodity, natural_sign));
-  }
+    var balance = get_quantity();
 
-  double get_balance([recurse=true, other_commodity=null, natural_sign=true]) {
-    if (other_commodity == null) other_commodity = _book.baseCurrency;
+    if (commodity != other_commodity) {
+      double factor, factor1, factor2;
 
-    double balance = get_quantity();
-
-    if (this.commodity != other_commodity) {
-      double factor = null;
-      double factor1 = null;
-      double factor2 = null;
-
-      if ((factor = this.commodity.conversion_factor(other_commodity)) != null) {
+      if ((factor = commodity.conversion_factor(other_commodity)) != null) {
         // Try converting this commodity into the other using the price list
         balance *= factor;
       }
-      else if ((factor = other_commodity.conversion_factor(this.commodity)) != null) {
+      else if ((factor = other_commodity.conversion_factor(commodity)) != null) {
         // Try converting the other commodity into this one using the price list
         balance /= factor;
       }
-      else if (((factor1 = this.commodity.conversion_factor(_parent.commodity)) != null) &&
+      else if (((factor1 = commodity.conversion_factor(_parent.commodity)) != null) &&
                ((factor2 = _parent.commodity.conversion_factor(other_commodity)) != null)) {
         // try converting through the parent commodity
         balance *= factor1 * factor2;
       }
-      else if (((factor1 = this.commodity.conversion_factor(_book.baseCurrency)) != null) &&
+      else if (((factor1 = commodity.conversion_factor(_book.baseCurrency)) != null) &&
                ((factor2 = _book.baseCurrency.conversion_factor(other_commodity)) != null)) {
         // Try converting through the base commodity
         balance *= factor1 * factor2;

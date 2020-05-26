@@ -16,10 +16,10 @@ class GncBook {
     }
 
     void open(String dbPath) async {
-        session = new GncDatabase(dbPath);
+        session = GncDatabase(dbPath);
 
         for (final commodity in await session.get_commodities()) {
-          commodityMap[commodity.guid] = GncCommodity(this, commodity);
+          commodityMap[commodity.guid] = GncCommodity(commodity);
         }
 
         for (final price in await session.get_prices()) {
@@ -28,10 +28,10 @@ class GncBook {
 
         // Create the tree of accounts and identify the root account
         for (final account in await session.get_accounts()) {
-          GncAccount newAcc = GncAccount(this, account, commodityMap[account.commodity_guid]);
+          var newAcc = GncAccount(this, account, commodityMap[account.commodity_guid]);
           accountMap[newAcc.guid] = newAcc;
 
-          if ((newAcc.account_type == "ROOT") && (newAcc.name == "Root Account")) {
+          if ((newAcc.account_type == 'ROOT') && (newAcc.name == 'Root Account')) {
             rootAccount = newAcc;
           }
         }
@@ -46,7 +46,7 @@ class GncBook {
         splitList.forEach((row) {
           final split = row.readTable(session.splits);
           final transaction = row.readTable(session.transactions);
-          accountMap[split.account_guid].addSplit(GncSplit(this, split, transaction));
+          accountMap[split.account_guid].addSplit(GncSplit(split, transaction));
         });
     }
 

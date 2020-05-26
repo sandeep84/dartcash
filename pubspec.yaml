@@ -1,13 +1,16 @@
 name: dartcash
 description: Dartlang implementation of GNUCash sqlite format file support.
+version: 1.0.1
+repository: https://github.com/sandeep84/dartcash
+homepage: https://github.com/sandeep84/dartcash
 
 environment:
   sdk: '>=2.8.1 <3.0.0'
 
 dependencies:
-  moor: # use the latest version
-  moor_ffi: # use the latest version
-  intl:
+  moor: ^3.1.0
+  moor_ffi: ^0.6.0
+  intl: ^0.16.1
 
 dev_dependencies:
   pedantic: ^1.9.0
