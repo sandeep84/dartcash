@@ -1,7 +1,6 @@
 import 'gnc_database.dart';
 
-class GncSplit 
-{
+class GncSplit {
   final Split _split;
   final Transaction _transaction;
 
@@ -16,4 +15,3 @@ class GncSplit
   String get description => _transaction.description;
   String get date => _transaction.post_date;
 }
-

@@ -2,8 +2,7 @@ import 'package:intl/intl.dart';
 
 import 'gnc_database.dart';
 
-class GncPrice
-{
+class GncPrice {
   final Price _price;
 
   GncPrice(this._price);
@@ -14,15 +13,15 @@ class GncPrice
   double get value => _price.value_num / _price.value_denom;
 }
 
-class GncCommodity 
-{
+class GncCommodity {
   final Commodity _commodity;
   NumberFormat currencyFormat;
   List<GncPrice> priceList = [];
 
   GncCommodity(this._commodity) {
-    final symbol = NumberFormat.currency().simpleCurrencySymbol(_commodity.mnemonic);
-    currencyFormat = NumberFormat.currency(symbol:symbol);
+    final symbol =
+        NumberFormat.currency().simpleCurrencySymbol(_commodity.mnemonic);
+    currencyFormat = NumberFormat.currency(symbol: symbol);
   }
 
   String get guid => _commodity.guid;
@@ -48,4 +47,3 @@ class GncCommodity
     return null;
   }
 }
-
