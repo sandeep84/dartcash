@@ -9,6 +9,8 @@ class GncBook {
     final Map<String, GncCommodity> commodityMap = {}; // map with key=guid
     GncAccount rootAccount;
 
+    bool get isOpen => session != null;
+
     GncCommodity get baseCurrency {
       return rootAccount.commodity;
     }

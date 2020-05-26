@@ -1,3 +1,5 @@
+import 'package:intl/intl.dart';
+
 import 'gnc_database.dart';
 import 'gnc_book.dart';
 import 'gnc_account.dart';
@@ -5,7 +7,6 @@ import 'gnc_account.dart';
 class GncSplit 
 {
   final GncBook _book;
-  GncAccount _parent;
   final Split _split;
   final Transaction _transaction;
 
@@ -19,5 +20,14 @@ class GncSplit
 
   String get description => _transaction.description;
   String get date => _transaction.post_date;
+
+  String getQuantityAsString(NumberFormat currencyFormat) {
+    return currencyFormat.format(quantity);
+  }
+
+  String getDateAsString() {
+    return DateFormat.yMd().format(DateTime.parse(date));
+  }
+
 }
 

@@ -1,3 +1,5 @@
+import 'package:intl/intl.dart';
+
 import 'gnc_database.dart';
 import 'gnc_book.dart';
 import 'gnc_split.dart';
@@ -22,6 +24,8 @@ class GncAccount
   String get account_type => _account.account_type;
   String get commodity_guid => _account.commodity_guid;
 
+  GncCommodity get baseCurrency => _book.baseCurrency;
+
   void addChild(GncAccount child) 
   {
     child._parent = this;
@@ -36,6 +40,19 @@ class GncAccount
 
   double get_quantity() {
     return quantity;
+  }
+
+  String getQuantityAsString() {
+    String symbol = NumberFormat.currency().simpleCurrencySymbol(this.commodity.mnemonic);
+    final currencyFormat = new NumberFormat.currency(symbol:symbol);
+    return currencyFormat.format(quantity);
+  }
+
+  String getBalanceAsString([recurse=true, other_commodity=null, natural_sign=true]) {
+    if (other_commodity == null) other_commodity = _book.baseCurrency;
+    String symbol = NumberFormat.currency().simpleCurrencySymbol(other_commodity.mnemonic);
+    final currencyFormat = new NumberFormat.currency(symbol:symbol);
+    return currencyFormat.format(get_balance(recurse, other_commodity, natural_sign));
   }
 
   double get_balance([recurse=true, other_commodity=null, natural_sign=true]) {
