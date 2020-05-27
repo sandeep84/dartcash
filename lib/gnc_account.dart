@@ -14,7 +14,28 @@ class GncAccount {
   List<GncSplit> splits = [];
   double quantity = 0.0;
 
-  GncAccount(this._book, this._account, this.commodity);
+  static final List<String> root_types = ['ROOT'];
+  static final List<String> asset_types = ['RECEIVABLE', 'MUTUAL', 'CASH', 'ASSET', 'BANK', 'STOCK'];
+  static final List<String> liability_types = ['CREDIT', 'LIABILITY', 'PAYABLE'];
+  static final List<String> income_types = ['INCOME'];
+  static final List<String> expense_types = ['EXPENSE'];
+  static final List<String> trading_types = ['TRADING'];
+  static final List<String> equity_types = ['EQUITY'];
+
+  // types that are compatible with other types
+  static List<String> incexp_types;
+  static List<String> assetliab_types;
+
+  // types according to the sign of their balance
+  static List<String> positive_types;
+  static List<String> negative_types;
+
+  GncAccount(this._book, this._account, this.commodity) {
+    incexp_types = income_types + expense_types;
+    assetliab_types = asset_types + liability_types;
+    positive_types = asset_types + expense_types + trading_types;
+    negative_types = liability_types + income_types + equity_types;
+  }
 
   String get guid => _account.guid;
   String get parent_guid => _account.parent_guid;
@@ -23,6 +44,8 @@ class GncAccount {
   String get commodity_guid => _account.commodity_guid;
 
   GncCommodity get baseCurrency => _book.baseCurrency;
+
+  double get sign => (negative_types.contains(account_type) ? -1.0 : 1.0);
 
   void addChild(GncAccount child) {
     child._parent = this;
@@ -34,14 +57,14 @@ class GncAccount {
     quantity += split.quantity;
   }
 
-  double get_quantity() {
-    return quantity;
+  double get_quantity([natural_sign = true]) {
+    return ((natural_sign && (quantity.abs() > 0)) ? quantity * sign : quantity);
   }
 
   double get_balance([recurse = true, other_commodity, natural_sign = true]) {
     other_commodity ??= _book.baseCurrency;
 
-    var balance = get_quantity();
+    var balance = quantity;
 
     if (commodity != other_commodity) {
       double factor, factor1, factor2;
@@ -70,8 +93,10 @@ class GncAccount {
 
     if (recurse) {
       children.forEach((child) =>
-          balance += child.get_balance(recurse, other_commodity, natural_sign));
+          balance += child.get_balance(recurse, other_commodity, false));
     }
+
+    if (natural_sign && (balance.abs() > 0) ) balance *= sign;
 
     return balance;
   }
