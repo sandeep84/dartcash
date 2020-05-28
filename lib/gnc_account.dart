@@ -68,49 +68,68 @@ class GncAccount {
     quantity += split.quantity;
   }
 
-  double get_quantity([natural_sign = true]) {
-    return ((natural_sign && (quantity.abs() > 0))
-        ? quantity * sign
-        : quantity);
+  double get_quantity([naturalSign = true]) {
+    return ((naturalSign && (quantity.abs() > 0)) ? quantity * sign : quantity);
   }
 
-  double get_balance([recurse = true, other_commodity, natural_sign = true]) {
-    other_commodity ??= _book.baseCurrency;
-
-    var balance = quantity;
-
-    if (commodity != other_commodity) {
+  double convertCommodity(double value, GncCommodity reportCommodity) {
+    if (commodity != reportCommodity) {
       double factor, factor1, factor2;
 
-      if ((factor = commodity.conversion_factor(other_commodity)) != null) {
+      if ((factor = commodity.conversion_factor(reportCommodity)) != null) {
         // Try converting this commodity into the other using the price list
-        balance *= factor;
-      } else if ((factor = other_commodity.conversion_factor(commodity)) !=
+        value *= factor;
+      } else if ((factor = reportCommodity.conversion_factor(commodity)) !=
           null) {
         // Try converting the other commodity into this one using the price list
-        balance /= factor;
+        value /= factor;
       } else if (((factor1 = commodity.conversion_factor(_parent.commodity)) !=
               null) &&
-          ((factor2 = _parent.commodity.conversion_factor(other_commodity)) !=
+          ((factor2 = _parent.commodity.conversion_factor(reportCommodity)) !=
               null)) {
         // try converting through the parent commodity
-        balance *= factor1 * factor2;
+        value *= factor1 * factor2;
       } else if (((factor1 = commodity.conversion_factor(_book.baseCurrency)) !=
               null) &&
-          ((factor2 = _book.baseCurrency.conversion_factor(other_commodity)) !=
+          ((factor2 = _book.baseCurrency.conversion_factor(reportCommodity)) !=
               null)) {
         // Try converting through the base commodity
-        balance *= factor1 * factor2;
+        value *= factor1 * factor2;
       }
     }
 
+    return value;
+  }
+
+  double get_balance({recurse = true, reportCommodity, naturalSign = true}) {
+    reportCommodity ??= _book.baseCurrency;
+
+    var balance = quantity;
+    balance = convertCommodity(balance, reportCommodity);
+
     if (recurse) {
-      children.forEach((child) =>
-          balance += child.get_balance(recurse, other_commodity, false));
+      children.forEach((child) => balance += child.get_balance(
+          recurse: recurse,
+          reportCommodity: reportCommodity,
+          naturalSign: false));
     }
 
-    if (natural_sign && (balance.abs() > 0)) balance *= sign;
+    if (naturalSign && (balance.abs() > 0)) balance *= sign;
 
     return balance;
+  }
+
+  double sumSplits(String startDate, String endDate,
+      [GncCommodity reportCommodity, bool naturalSign = true]) {
+    var sum = 0.0;
+    for (final split in splits) {
+      if ((split.date.compareTo(startDate) >= 0) &&
+          (split.date.compareTo(endDate) < 0)) {
+        sum += split.quantity;
+      }
+    }
+    if (reportCommodity != null) sum = convertCommodity(sum, reportCommodity);
+    if (naturalSign && (sum.abs() > 0)) sum *= sign;
+    return sum;
   }
 }

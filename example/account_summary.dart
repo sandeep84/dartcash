@@ -15,6 +15,7 @@ void main() async {
   var gncBook = GncBook();
   await gncBook.open('HomeAccounts.gnucash');
   for (final account in gncBook.accounts()) {
-    await printAccount(account, '', gncBook.baseCurrency.currencyFormat);
+    printAccount(account, '', gncBook.baseCurrency.currencyFormat);
   }
+  gncBook.close();
 }
