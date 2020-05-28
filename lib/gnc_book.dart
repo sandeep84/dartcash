@@ -52,6 +52,7 @@ class GncBook {
   }
 
   void close() {
+    session.close();
     session = null;
     rootAccount = null;
     accountMap.clear();
