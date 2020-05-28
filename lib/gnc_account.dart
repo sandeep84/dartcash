@@ -15,8 +15,19 @@ class GncAccount {
   double quantity = 0.0;
 
   static final List<String> root_types = ['ROOT'];
-  static final List<String> asset_types = ['RECEIVABLE', 'MUTUAL', 'CASH', 'ASSET', 'BANK', 'STOCK'];
-  static final List<String> liability_types = ['CREDIT', 'LIABILITY', 'PAYABLE'];
+  static final List<String> asset_types = [
+    'RECEIVABLE',
+    'MUTUAL',
+    'CASH',
+    'ASSET',
+    'BANK',
+    'STOCK'
+  ];
+  static final List<String> liability_types = [
+    'CREDIT',
+    'LIABILITY',
+    'PAYABLE'
+  ];
   static final List<String> income_types = ['INCOME'];
   static final List<String> expense_types = ['EXPENSE'];
   static final List<String> trading_types = ['TRADING'];
@@ -58,7 +69,9 @@ class GncAccount {
   }
 
   double get_quantity([natural_sign = true]) {
-    return ((natural_sign && (quantity.abs() > 0)) ? quantity * sign : quantity);
+    return ((natural_sign && (quantity.abs() > 0))
+        ? quantity * sign
+        : quantity);
   }
 
   double get_balance([recurse = true, other_commodity, natural_sign = true]) {
@@ -96,7 +109,7 @@ class GncAccount {
           balance += child.get_balance(recurse, other_commodity, false));
     }
 
-    if (natural_sign && (balance.abs() > 0) ) balance *= sign;
+    if (natural_sign && (balance.abs() > 0)) balance *= sign;
 
     return balance;
   }
