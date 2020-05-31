@@ -10,3 +10,7 @@
 
 - Add natural sign support and move stringification functions into commodity class.
 
+## 1.1.1
+
+- Add accountSummary calculations functions.
+

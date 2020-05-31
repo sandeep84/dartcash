@@ -68,7 +68,7 @@ class GncAccount {
     quantity += split.quantity;
   }
 
-  double get_quantity([naturalSign = true]) {
+  double getQuantity([naturalSign = true]) {
     return ((naturalSign && (quantity.abs() > 0)) ? quantity * sign : quantity);
   }
 
@@ -101,14 +101,14 @@ class GncAccount {
     return value;
   }
 
-  double get_balance({recurse = true, reportCommodity, naturalSign = true}) {
+  double getBalance({recurse = true, reportCommodity, naturalSign = true}) {
     reportCommodity ??= _book.baseCurrency;
 
     var balance = quantity;
     balance = convertCommodity(balance, reportCommodity);
 
     if (recurse) {
-      children.forEach((child) => balance += child.get_balance(
+      children.forEach((child) => balance += child.getBalance(
           recurse: recurse,
           reportCommodity: reportCommodity,
           naturalSign: false));
