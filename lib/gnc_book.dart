@@ -15,7 +15,7 @@ class GncBook {
     return rootAccount.commodity;
   }
 
-  void open(String dbPath) async {
+  Future<void> open(String dbPath) async {
     session = GncDatabase(dbPath);
 
     for (final commodity in await session.get_commodities()) {
