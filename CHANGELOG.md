@@ -14,3 +14,7 @@
 
 - Add accountSummary calculations functions.
 
+## 1.1.1+1
+
+- Fix bug with calling book.close() on a null session.
+
