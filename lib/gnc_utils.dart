@@ -4,8 +4,8 @@ import 'dart:collection';
 
 void splitSummary(
     String accountType,
-    String startDate,
-    String endDate,
+    DateTime startDate,
+    DateTime endDate,
     int maxLevel,
     GncCommodity reportCommodity,
     int level,
@@ -33,13 +33,14 @@ void splitSummary(
 
 LinkedHashMap<String, double> accountSummaryByType(
     {String accountType,
-    String startDate,
-    String endDate,
+    DateTime startDate,
+    DateTime endDate,
     int maxLevel = 2,
     int numDetailedAccounts = 7,
     GncCommodity reportCommodity,
     GncAccount rootAccount}) {
-  Map<GncAccount, double> summary = {};
+  Map<GncAccount, double> summary;
+  summary = {};
   splitSummary(accountType, startDate, endDate, maxLevel, reportCommodity, 0,
       rootAccount, rootAccount, summary);
   var sortedKeys = summary.keys.toList(growable: false)

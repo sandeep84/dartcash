@@ -3,12 +3,12 @@ import 'package:dartcash/gnc_utils.dart';
 
 void main() async {
   var gncBook = GncBook();
-  await gncBook.open('HomeAccounts.gnucash');
+  await gncBook.sqliteOpen('HomeAccounts.gnucash');
 
   var summary = accountSummaryByType(
       accountType: 'EXPENSE',
-      startDate: '2020-04-01',
-      endDate: '2020-05-01',
+      startDate: DateTime(2020, 4, 1),
+      endDate: DateTime(2020, 5, 1),
       reportCommodity: gncBook.baseCurrency,
       rootAccount: gncBook.rootAccount);
   summary.forEach((account, sum) =>

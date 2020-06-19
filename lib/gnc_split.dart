@@ -13,5 +13,5 @@ class GncSplit {
   double get quantity => _split.quantity_num / _split.quantity_denom;
 
   String get description => _transaction.description;
-  String get date => _transaction.post_date;
+  DateTime get date => _transaction.post_date;
 }

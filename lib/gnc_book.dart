@@ -15,9 +15,28 @@ class GncBook {
     return rootAccount.commodity;
   }
 
-  Future<void> open(String dbPath) async {
-    session = GncDatabase(dbPath);
+  Future<void> sqliteOpen(String dbPath) async {
+    session = GncDatabase.sqlite(dbPath);
+    await initAccounts();
+  }
 
+  Future<void> postgreOpen(
+      {String host,
+      int port,
+      String user,
+      String password,
+      String databaseName}) async {
+    session = GncDatabase.postgre(
+      host: host,
+      port: port,
+      user: user,
+      password: password,
+      databaseName: databaseName,
+    );
+    await initAccounts();
+  }
+
+  Future<void> initAccounts() async {
     for (final commodity in await session.get_commodities()) {
       commodityMap[commodity.guid] = GncCommodity(commodity);
     }
@@ -43,12 +62,10 @@ class GncBook {
       }
     });
 
-    final splitList = await session.get_splits();
-    splitList.forEach((row) {
-      final split = row.readTable(session.splits);
-      final transaction = row.readTable(session.transactions);
-      accountMap[split.account_guid].addSplit(GncSplit(split, transaction));
-    });
+    for (final split in await session.get_splits()) {
+      accountMap[split.account_guid]
+          .addSplit(GncSplit(split, split.transaction));
+    }
   }
 
   void close() {

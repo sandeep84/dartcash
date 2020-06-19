@@ -13,7 +13,7 @@ void printAccount(GncAccount account, String prefix, NumberFormat baseFormat) {
 
 void main() async {
   var gncBook = GncBook();
-  await gncBook.open('HomeAccounts.gnucash');
+  await gncBook.sqliteOpen('HomeAccounts.gnucash');
   for (final account in gncBook.accounts()) {
     printAccount(account, '', gncBook.baseCurrency.currencyFormat);
   }

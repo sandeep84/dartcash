@@ -119,7 +119,7 @@ class GncAccount {
     return balance;
   }
 
-  double sumSplits(String startDate, String endDate,
+  double sumSplits(DateTime startDate, DateTime endDate,
       [GncCommodity reportCommodity, bool naturalSign = true]) {
     var sum = 0.0;
     for (final split in splits) {

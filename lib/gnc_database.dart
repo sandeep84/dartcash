@@ -1,101 +1,187 @@
-import 'package:moor_ffi/moor_ffi.dart';
-import 'package:moor/moor.dart';
-import 'dart:io';
+import 'package:database/sql.dart';
+import 'package:database_adapter_postgre/database_adapter_postgre.dart';
 
-// assuming that your file is called account.dart. This will give an error at first,
-// but it's needed for moor to know about the generated code
-part 'gnc_database.g.dart';
-
-@DataClassName('Commodity')
-class Commodities extends Table {
-  TextColumn get guid => text().withLength(max: 32)();
-  TextColumn get namespace => text().withLength(max: 2048)();
-  TextColumn get mnemonic => text().withLength(max: 2048)();
-  TextColumn get fullname => text().withLength(max: 2048)();
-  IntColumn get fraction => integer()();
-
-  @override
-  Set<Column> get primaryKey => {guid};
+class NotImplemented implements Exception {
+  String cause;
+  NotImplemented(this.cause);
 }
 
-class Prices extends Table {
-  TextColumn get guid => text().withLength(max: 32)();
-  TextColumn get commodity_guid => text().withLength(max: 32)();
-  TextColumn get currency_guid => text().withLength(max: 32)();
-  TextColumn get date => text().withLength(max: 19)();
-  IntColumn get value_num => integer()();
-  IntColumn get value_denom => integer()();
+class Commodity {
+  String guid;
+  String namespace;
+  String mnemonic;
+  String fullname;
+  int fraction;
 
-  @override
-  Set<Column> get primaryKey => {guid};
+  Commodity(Map _commodity) {
+    guid = _commodity['guid'];
+    namespace = _commodity['namespace'];
+    mnemonic = _commodity['mnemonic'];
+    fullname = _commodity['fullname'];
+    fraction = _commodity['fraction'];
+  }
 }
 
-class Accounts extends Table {
-  TextColumn get guid => text().withLength(max: 32)();
-  TextColumn get parent_guid => text().withLength(max: 32)();
-  TextColumn get name => text().withLength(max: 2048)();
-  TextColumn get account_type => text().withLength(max: 2048)();
-  TextColumn get commodity_guid => text().withLength(max: 32)();
-  IntColumn get commodity_scu => integer()();
-  IntColumn get non_std_scu => integer()();
+class Price {
+  String guid;
+  String commodity_guid;
+  String currency_guid;
+  DateTime date;
+  int value_num;
+  int value_denom;
 
-  @override
-  Set<Column> get primaryKey => {guid};
+  Price(Map _price) {
+    guid = _price['guid'];
+    commodity_guid = _price['commodity_guid'];
+    currency_guid = _price['currency_guid'];
+    date = _price['date'];
+    value_num = _price['value_num'];
+    value_denom = _price['value_denom'];
+  }
 }
 
-class Transactions extends Table {
-  TextColumn get guid => text().withLength(max: 32)();
-  TextColumn get currency_guid => text().withLength(max: 32)();
-  TextColumn get num => text().withLength(max: 2048)();
-  TextColumn get post_date => text().withLength(max: 19)();
-  TextColumn get enter_date => text().withLength(max: 19)();
-  TextColumn get description => text().withLength(max: 2048)();
+class Account {
+  String guid;
+  String parent_guid;
+  String name;
+  String account_type;
+  String commodity_guid;
+  int commodity_scu;
+  int non_std_scu;
+
+  Account(Map _account) {
+    guid = _account['guid'];
+    parent_guid = _account['parent_guid'];
+    name = _account['name'];
+    account_type = _account['account_type'];
+    commodity_guid = _account['commodity_guid'];
+    commodity_scu = _account['commodity_scu'];
+    non_std_scu = _account['non_std_scu'];
+  }
 }
 
-class Splits extends Table {
-  TextColumn get guid => text().withLength(max: 32)();
-  TextColumn get tx_guid => text().withLength(max: 32)();
-  TextColumn get account_guid => text().withLength(max: 32)();
-  TextColumn get memo => text().withLength(max: 2048)();
-  TextColumn get action => text().withLength(max: 2048)();
-  IntColumn get value_num => integer()();
-  IntColumn get value_denom => integer()();
-  IntColumn get quantity_num => integer()();
-  IntColumn get quantity_denom => integer()();
+class Transaction {
+  String guid;
+  String currency_guid;
+  String num;
+  DateTime post_date;
+  DateTime enter_date;
+  String description;
 
-  @override
-  Set<Column> get primaryKey => {guid};
+  Transaction(Map _transaction) {
+    guid = _transaction['guid'];
+    currency_guid = _transaction['currency_guid'];
+    num = _transaction['num'];
+    post_date = _transaction['post_date'];
+    enter_date = _transaction['enter_date'];
+    description = _transaction['description'];
+  }
 }
 
-LazyDatabase _openConnection(String dbPath) {
-  // the LazyDatabase util lets us find the right location for the file async.
-  return LazyDatabase(() async {
-    return VmDatabase(File(dbPath));
-  });
+class Split {
+  String guid;
+  String tx_guid;
+  String account_guid;
+  String memo;
+  String action;
+  int value_num;
+  int value_denom;
+  int quantity_num;
+  int quantity_denom;
+
+  Transaction transaction;
+
+  Split(Map _split) {
+    guid = _split['guid'];
+    tx_guid = _split['tx_guid'];
+    account_guid = _split['account_guid'];
+    memo = _split['memo'];
+    action = _split['action'];
+    value_num = _split['value_num'];
+    value_denom = _split['value_denom'];
+    quantity_num = _split['quantity_num'];
+    quantity_denom = _split['quantity_denom'];
+
+    transaction = Transaction(_split);
+  }
 }
 
-@UseMoor(tables: [Commodities, Prices, Accounts, Splits, Transactions])
-class GncDatabase extends _$GncDatabase {
-  // we tell the database where to store the data with this constructor
-  GncDatabase(String dbPath) : super(_openConnection(dbPath));
+class GncDatabase {
+  Postgre config;
+  SqlClient client;
 
-  // you should bump this number whenever you change or add a table definition. Migrations
-  // are covered later in this readme.
-  @override
-  int get schemaVersion => 1;
+  GncDatabase.sqlite(String dbPath) {
+    throw NotImplemented('SQLite support not implemented yet.');
+  }
 
-  Future<List<Account>> get_accounts() => select(accounts).get();
-  Future<List<TypedResult>> get_splits() => (select(transactions)
-            ..orderBy([
-              (t) =>
-                  OrderingTerm(expression: t.post_date, mode: OrderingMode.desc)
-            ]))
-          .join([
-        leftOuterJoin(splits, splits.tx_guid.equalsExp(transactions.guid)),
-      ]).get();
-  Future<List<Commodity>> get_commodities() => select(commodities).get();
-  Future<List<Price>> get_prices() => (select(prices)
-        ..orderBy(
-            [(t) => OrderingTerm(expression: t.date, mode: OrderingMode.desc)]))
-      .get();
+  GncDatabase.postgre(
+      {String host,
+      int port,
+      String user,
+      String password,
+      String databaseName}) {
+    config = Postgre(
+      host: host,
+      port: port,
+      user: user,
+      password: password,
+      databaseName: databaseName,
+    );
+
+    client = config.database().sqlClient;
+  }
+
+  void close() {
+    client = null;
+    config.close();
+    config = null;
+  }
+
+  Future<List<Account>> get_accounts() async {
+    List<Account> accounts;
+    accounts = [];
+    for (final _acc in await client.query('SELECT * from accounts').toMaps()) {
+      accounts.add(Account(_acc));
+    }
+
+    return accounts;
+  }
+
+  Future<List<Split>> get_splits() async {
+    List<Split> splits;
+    splits = [];
+    for (final _split in await client.query('''
+      SELECT * from transactions
+      LEFT OUTER JOIN splits ON transactions.guid = splits.tx_guid
+      ORDER BY transactions.post_date DESC;
+    ''').toMaps()) {
+      splits.add(Split(_split));
+    }
+
+    return splits;
+  }
+
+  Future<List<Commodity>> get_commodities() async {
+    List<Commodity> commodities;
+    commodities = [];
+    for (final _commodity
+        in await client.query('SELECT * from commodities').toMaps()) {
+      commodities.add(Commodity(_commodity));
+    }
+
+    return commodities;
+  }
+
+  Future<List<Price>> get_prices() async {
+    List<Price> prices;
+    prices = [];
+    for (final _price in await client.query('''
+      SELECT * from prices
+      ORDER BY prices.date DESC;
+    ''').toMaps()) {
+      prices.add(Price(_price));
+    }
+
+    return prices;
+  }
 }
