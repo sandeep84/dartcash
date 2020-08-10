@@ -1,4 +1,6 @@
 import 'package:database/sql.dart';
+import 'package:database/database_adapter.dart';
+import 'package:database_adapter_sqlite/database_adapter_sqlite.dart';
 import 'package:database_adapter_postgre/database_adapter_postgre.dart';
 
 class NotImplemented implements Exception {
@@ -12,6 +14,7 @@ class Commodity {
   String mnemonic;
   String fullname;
   int fraction;
+  String quote_source;
 
   Commodity(Map _commodity) {
     guid = _commodity['guid'];
@@ -19,6 +22,7 @@ class Commodity {
     mnemonic = _commodity['mnemonic'];
     fullname = _commodity['fullname'];
     fraction = _commodity['fraction'];
+    quote_source = _commodity['quote_source'];
   }
 }
 
@@ -34,7 +38,12 @@ class Price {
     guid = _price['guid'];
     commodity_guid = _price['commodity_guid'];
     currency_guid = _price['currency_guid'];
-    date = _price['date'];
+    if (_price['date'] is String) {
+      // SQLite stores dates as strings
+      date = DateTime.parse(_price['date']);
+    } else {
+      date = _price['date'];
+    }
     value_num = _price['value_num'];
     value_denom = _price['value_denom'];
   }
@@ -72,8 +81,18 @@ class Transaction {
     guid = _transaction['guid'];
     currency_guid = _transaction['currency_guid'];
     num = _transaction['num'];
-    post_date = _transaction['post_date'];
-    enter_date = _transaction['enter_date'];
+    if (_transaction['post_date'] is String) {
+      // SQLite stores dates as strings
+      post_date = DateTime.parse(_transaction['post_date']);
+    } else {
+      post_date = _transaction['post_date'];
+    }
+    if (_transaction['enter_date'] is String) {
+      // SQLite stores dates as strings
+      enter_date = DateTime.parse(_transaction['enter_date']);
+    } else {
+      enter_date = _transaction['enter_date'];
+    }
     description = _transaction['description'];
   }
 }
@@ -107,11 +126,12 @@ class Split {
 }
 
 class GncDatabase {
-  Postgre config;
+  SqlDatabaseAdapter config;
   SqlClient client;
 
   GncDatabase.sqlite(String dbPath) {
-    throw NotImplemented('SQLite support not implemented yet.');
+    config = SQLite(path: dbPath);
+    client = config.database().sqlClient;
   }
 
   GncDatabase.postgre(

@@ -1,9 +1,13 @@
+import 'dart:io';
+import 'package:path/path.dart' as p;
+
 import 'package:dartcash/gnc_book.dart';
 import 'package:dartcash/gnc_utils.dart';
 
 void main() async {
   var gncBook = GncBook();
-  await gncBook.sqliteOpen('HomeAccounts.gnucash');
+  await gncBook
+      .sqliteOpen(p.join(Directory.current.path, 'HomeAccounts.gnucash'));
 
   var summary = accountSummaryByType(
       accountType: 'EXPENSE',

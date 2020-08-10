@@ -7,6 +7,8 @@ pubspec.lock
 build/
 .idea
 .vscode
+.flutter-plugins-dependencies
+.flutter-plugins
 
 # Directory created by dartdoc
 doc/api/

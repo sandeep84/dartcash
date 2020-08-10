@@ -38,7 +38,7 @@ class GncBook {
 
   Future<void> initAccounts() async {
     for (final commodity in await session.get_commodities()) {
-      commodityMap[commodity.guid] = GncCommodity(commodity);
+      commodityMap[commodity.guid] = GncCommodity(this, commodity);
     }
 
     for (final price in await session.get_prices()) {
@@ -81,4 +81,19 @@ class GncBook {
   }
 
   GncAccount getAccountByGuid(String guid) => accountMap[guid];
+
+  GncCommodity getCommodityByMnemonic(String mnemonic) {
+    for (final commodity in commodityMap.values) {
+      if (commodity.mnemonic == mnemonic) {
+        return commodity;
+      }
+    }
+    return null;
+  }
+
+  Future<void> updatePriceDatabase() async {
+    for (final commodity in commodityMap.values) {
+      await commodity.updatePrice();
+    }
+  }
 }
