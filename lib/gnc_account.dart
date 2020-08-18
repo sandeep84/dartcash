@@ -95,6 +95,8 @@ class GncAccount {
               null)) {
         // Try converting through the base commodity
         value *= factor1 * factor2;
+      } else {
+        value = 0.0;
       }
     }
 
