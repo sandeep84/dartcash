@@ -23,7 +23,7 @@ void splitSummary(
           level + 1, acc, acc, accMap);
     } else {
       // Update the rootAccount entry in the map with the current account sum
-      accMap[rootAccount] += acc.sumSplits(startDate, endDate);
+      accMap[rootAccount] += acc.sumSplits(startDate, endDate, reportCommodity);
       // Recurse on all the children of this account
       splitSummary(accountType, startDate, endDate, maxLevel, reportCommodity,
           level + 1, rootAccount, acc, accMap);
